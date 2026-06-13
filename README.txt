@@ -1,0 +1,1 @@
+Starter web project generated from your Android app structure. Upload remaining Java/PHP files to continue full conversion.

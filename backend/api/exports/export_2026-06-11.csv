@@ -1,0 +1,14 @@
+Name,Email,Phone,Quiz1,Quiz2,Quiz3,Consent,Apt1,Apt2,Apt3,Apt4
+jana,jana123@gmail.com,8143190406,3,1,1,yes,present,present,present,present
+mouni,mouni123@gmail.com,8143190405,2,0,0,yes,present,absent,absent,absent
+"nav ch",navaneeth@123gmail.com,9951290406,0,1,0,yes,present,present,present,present
+ravi,ravi123@gmail.com,8143190402,1,3,0,yes,present,present,present,present
+"John Doe",johndoe@test.com,1234567890,3,0,0,yes,present,present,absent,absent
+"Dast Patient",test_dast_patient@rct.com,9988776655,3,0,0,yes,present,absent,absent,absent
+Lokesh,lokeshlokeshlokey2@gmail.com,8143190406,0,0,0,no,absent,absent,absent,absent
+"Test User",testuser123@gmail.com,1234567890,0,0,0,no,absent,absent,absent,absent
+"dathu  d",dathu12@gmail.com,1234567890,0,0,0,no,absent,absent,absent,absent
+"rathan R",rathan123@gmail.com,8143190407,0,0,0,no,absent,absent,absent,absent
+"Test Patient",test_dast_patient2@rct.com,1234567890,0,0,0,no,absent,absent,absent,absent
+"Test Patient",test_dast_patient3@rct.com,1234567890,0,0,0,no,absent,absent,absent,absent
+"Test Sanity",valid@rct.com,aaaaaaaaaaaaaaaaaaaa,0,0,0,no,absent,absent,absent,absent

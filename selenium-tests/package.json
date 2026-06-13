@@ -1,0 +1,13 @@
+{
+  "name": "rct-selenium-tests",
+  "version": "1.0.0",
+  "description": "E2E Selenium tests for RCT Education Portal",
+  "main": "tests/login.test.js",
+  "scripts": {
+    "test:login": "node tests/login.test.js",
+    "test:e2e": "node tests/e2e.test.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.27.0"
+  }
+}

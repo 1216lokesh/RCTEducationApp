@@ -1,0 +1,54 @@
+{
+  "TC-FE-AUTH-01": {
+    "status": "Pass",
+    "actual": "Successfully registered patient and loaded dashboard: \"Welcome, E2E Patient-1781259183470\""
+  },
+  "TC-FE-PAT-01": {
+    "status": "Pass",
+    "actual": "Verified warning card text: \"No procedure assigned yet. Please contact your doctor. Please contact your dentist to assign your procedure treatment plan.\""
+  },
+  "TC-FE-ADM-03": {
+    "status": "Pass",
+    "actual": "Assigned Apexification & Intervention group: \"Clinical procedure assigned successfully!\""
+  },
+  "TC-FE-PAT-04": {
+    "status": "Pass",
+    "actual": "Baseline questionnaire submitted; redirected to procedure info page."
+  },
+  "TC-FE-PAT-05": {
+    "status": "Pass",
+    "actual": "Procedure info read; successfully accessed education slide panel."
+  },
+  "TC-FE-PAT-06": {
+    "status": "Pass",
+    "actual": "Anxiety scale scores submitted successfully."
+  },
+  "TC-FE-PAT-07": {
+    "status": "Pass",
+    "actual": "Quiz answers submitted successfully. Score recorded: \"Your Score: 3 / 3\""
+  },
+  "TC-FE-PAT-02": {
+    "status": "Pass",
+    "actual": "Checked digital agreement consent box and submitted."
+  },
+  "TC-FE-PAT-03": {
+    "status": "Pass",
+    "actual": "Satisfaction scores completed. Patient Dashboard status: \"1 / 4 Completed\""
+  },
+  "TC-FE-PAT-08": {
+    "status": "Pass",
+    "actual": "Post-op instructions read; patient dashboard progress incremented to: \"2 / 4 Completed\""
+  },
+  "TC-FE-PAT-09": {
+    "status": "Pass",
+    "actual": "Appointment 3 completed. Dashboard progress: \"3 / 4 Completed\""
+  },
+  "TC-FE-PAT-10": {
+    "status": "Pass",
+    "actual": "Appointment 4 Follow Up survey completed. Final progress: \"4 / 4 Completed\""
+  },
+  "TC-FE-ADM-01": {
+    "status": "Pass",
+    "actual": "Admin loaded details; verified all attendance marked Present, quiz scores 3/3, and digital consent Signed."
+  }
+}
