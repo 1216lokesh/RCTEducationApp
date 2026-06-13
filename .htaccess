@@ -1,0 +1,2 @@
+# Prioritize index.php for local development routing to the dental app
+DirectoryIndex index.php index.html
