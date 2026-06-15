@@ -38,7 +38,7 @@ jobs:
 
       - name: Start PHP Local Web Server
         run: |
-          sudo php -S 127.0.0.1:80 &
+          DB_HOST=127.0.0.1 php -S 127.0.0.1:8080 &
           sleep 3
 
       - name: Setup Node.js
@@ -61,7 +61,7 @@ jobs:
       - name: Run E2E Login Tests
         env:
           HEADLESS: "true"
-          TEST_URL: "http://127.0.0.1/rct-education-web/frontend/index.php#/login"
+          TEST_URL: "http://127.0.0.1:8080/rct-education-web/frontend/index.php#/login"
         run: |
           cd rct-education-web/frontend
           npm run login
