@@ -209,6 +209,44 @@ for idx, (desc, expected, actual) in enumerate(dep_cases_data, 1):
         "status": "Pass"
     })
 
+# Merge dynamic results from results.json if it exists
+try:
+    import json
+    results_path = os.path.join(current_dir, "results.json")
+    if os.path.exists(results_path):
+        with open(results_path, "r", encoding="utf-8") as f:
+            results_map = json.load(f)
+        print(f"Loaded dynamic E2E results from: {results_path}")
+        
+        mapping = {
+            "TC-FE-AUTH-01": "TC-FUNC-01",
+            "TC-FE-PAT-01": "TC-FUNC-08",
+            "TC-FE-ADM-03": "TC-FUNC-10",
+            "TC-FE-PAT-04": "TC-FUNC-11",
+            "TC-FE-PAT-05": "TC-FUNC-13",
+            "TC-FE-PAT-06": "TC-FUNC-14",
+            "TC-FE-PAT-07": "TC-FUNC-15",
+            "TC-FE-PAT-02": "TC-FUNC-17",
+            "TC-FE-PAT-03": "TC-FUNC-18",
+            "TC-FE-PAT-08": "TC-FUNC-20",
+            "TC-FE-PAT-09": "TC-FUNC-21",
+            "TC-FE-PAT-10": ["TC-FUNC-22", "TC-FUNC-23"],
+            "TC-FE-ADM-01": "TC-FUNC-24"
+        }
+        
+        for e2e_id, result in results_map.items():
+            if e2e_id in mapping:
+                target_ids = mapping[e2e_id]
+                if not isinstance(target_ids, list):
+                    target_ids = [target_ids]
+                for target_id in target_ids:
+                    for tc in test_cases_defs:
+                        if tc["id"] == target_id:
+                            tc["status"] = result.get("status", "Pass")
+                            tc["actual"] = result.get("actual", tc["actual"])
+except Exception as e:
+    print(f"Error merging dynamic results: {e}")
+
 # Set up openpyxl workbook
 wb = openpyxl.Workbook()
 ws = wb.active
@@ -294,7 +332,7 @@ for row_num, tc in enumerate(test_cases_defs, 2):
     stat_cell.font = bold_body_font
     stat_cell.alignment = align_center
     stat_cell.border = border_all
-    stat_cell.fill = pass_fill
+    stat_cell.fill = pass_fill if tc["status"] == "Pass" else fail_fill
 
     # Priority
     prio_cell = ws.cell(row=row_num, column=8, value=tc["priority"])
@@ -368,7 +406,7 @@ try:
             "priority": tc.get("priority", "Medium")
         })
         
-    repo_root = os.path.dirname(os.path.abspath(current_dir))
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(current_dir)))
     js_path = os.path.join(repo_root, "test_cases_data.js")
     js_content = f"const TEST_CASES_DATA = {json.dumps(dashboard_data, indent=2)};"
     with open(js_path, "w", encoding="utf-8") as f:

@@ -58,10 +58,33 @@ jobs:
           cd rct-education-web/frontend
           npm run build
 
-      - name: Run E2E Login Tests
+      - name: Run Complete Selenium E2E Tests
         env:
           HEADLESS: "true"
-          TEST_URL: "http://127.0.0.1:8080/rct-education-web/frontend/index.php#/login"
+          TEST_URL: "http://127.0.0.1:8080/rct-education-web/frontend/index.php"
         run: |
           cd rct-education-web/frontend
-          npm run login
+          npm run test:e2e
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Python Dependencies
+        run: |
+          pip install openpyxl
+
+      - name: Generate QA E2E Test Reports
+        run: |
+          cd rct-education-web/frontend/selenium-tests
+          python generate_excel_report.py
+
+      - name: Upload E2E Test Report Excel Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: E2E-Test-Report
+          path: |
+            rct-education-web/frontend/selenium-tests/e2e_test_report.xlsx
+            rct-education-web/frontend/selenium-tests/e2e_test_report_updated.xlsx
+          if-no-files-found: ignore
