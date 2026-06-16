@@ -243,7 +243,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-SEC-01"
         try:
-            driver.get(f"{BASE_URL}/frontend/patient/dashboard.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php")
             time.sleep(1)
             curr_url = driver.current_url
             if "login.php" in curr_url:
@@ -258,7 +258,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-AUTH-01"
         try:
-            driver.get(f"{BASE_URL}/frontend/auth/register.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/auth/register.php")
             wait.until(EC.presence_of_element_located((By.ID, "first_name")))
             driver.find_element(By.ID, "first_name").send_keys("Frontend")
             driver.find_element(By.ID, "last_name").send_keys("Patient")
@@ -293,7 +293,7 @@ def run_tests():
         try:
             # Clear cookies to simulate anonymous registration try
             driver.delete_all_cookies()
-            driver.get(f"{BASE_URL}/frontend/auth/register.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/auth/register.php")
             wait.until(EC.presence_of_element_located((By.ID, "first_name")))
             driver.find_element(By.ID, "first_name").send_keys("Frontend")
             driver.find_element(By.ID, "last_name").send_keys("Patient")
@@ -317,7 +317,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-AUTH-04"
         try:
-            driver.get(f"{BASE_URL}/frontend/auth/login.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/auth/login.php")
             wait.until(EC.presence_of_element_located((By.ID, "email")))
             driver.find_element(By.ID, "email").send_keys(TEST_EMAIL)
             driver.find_element(By.ID, "password").send_keys("wrong_pass_here")
@@ -337,7 +337,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-AUTH-03"
         try:
-            driver.get(f"{BASE_URL}/frontend/auth/login.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/auth/login.php")
             wait.until(EC.presence_of_element_located((By.ID, "email")))
             driver.find_element(By.ID, "email").clear()
             driver.find_element(By.ID, "email").send_keys(TEST_EMAIL)
@@ -358,7 +358,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-SEC-02"
         try:
-            driver.get(f"{BASE_URL}/frontend/admin/dashboard.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/admin/dashboard.php")
             time.sleep(1.5)
             src = driver.page_source
             if "Access Denied" in src or "403" in src:
@@ -369,7 +369,7 @@ def run_tests():
             results[tc_id] = {"status": "Fail", "actual": f"Error: {str(e)}"}
 
         # Navigate back to patient dashboard
-        driver.get(f"{BASE_URL}/frontend/patient/dashboard.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php")
         time.sleep(1)
 
         # ----------------------------------------------------
@@ -391,7 +391,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-PAT-02"
         try:
-            driver.get(f"{BASE_URL}/frontend/patient/consent.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/patient/consent.php")
             wait.until(EC.presence_of_element_located((By.NAME, "agree")))
             checkbox = driver.find_element(By.NAME, "agree")
             if not checkbox.is_selected():
@@ -437,7 +437,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-PAT-04"
         try:
-            driver.get(f"{BASE_URL}/frontend/patient/baseline.php?apt=1")
+            driver.get(f"{BASE_URL}/frontend_php_backup/patient/baseline.php?apt=1")
             wait.until(EC.presence_of_element_located((By.NAME, "q1")))
             
             # Select first radio option for each question
@@ -486,7 +486,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-PAT-06"
         try:
-            driver.get(f"{BASE_URL}/frontend/patient/anxiety.php?apt=1")
+            driver.get(f"{BASE_URL}/frontend_php_backup/patient/anxiety.php?apt=1")
             wait.until(EC.presence_of_element_located((By.NAME, "q1")))
             
             # Select moderately (value 2) for q1 to q5
@@ -511,7 +511,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-PAT-07"
         try:
-            driver.get(f"{BASE_URL}/frontend/patient/quiz.php?apt=1")
+            driver.get(f"{BASE_URL}/frontend_php_backup/patient/quiz.php?apt=1")
             wait.until(EC.presence_of_element_located((By.NAME, "q1")))
             
             # Select correct options (value 1)
@@ -540,7 +540,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-PAT-08"
         try:
-            driver.get(f"{BASE_URL}/frontend/patient/postop.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/patient/postop.php")
             safe_click(driver, By.XPATH, "//a[contains(@href, 'dashboard.php')]")
             time.sleep(1.5)
             
@@ -556,7 +556,7 @@ def run_tests():
         # Admin UI: Log in as Admin
         # ----------------------------------------------------
         driver.delete_all_cookies()
-        driver.get(f"{BASE_URL}/frontend/auth/login.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/auth/login.php")
         wait.until(EC.presence_of_element_located((By.ID, "email")))
         driver.find_element(By.ID, "email").send_keys("admin@rct.com")
         driver.find_element(By.ID, "password").send_keys("admin123")
@@ -581,7 +581,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-ADM-02"
         try:
-            driver.get(f"{BASE_URL}/frontend/admin/patients.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/admin/patients.php")
             wait.until(EC.presence_of_element_located((By.NAME, "search")))
             search_input = driver.find_element(By.NAME, "search")
             search_input.send_keys("Frontend")
@@ -601,7 +601,7 @@ def run_tests():
         # ----------------------------------------------------
         tc_id = "TC-FE-ADM-03"
         try:
-            driver.get(f"{BASE_URL}/frontend/admin/patient-detail.php?id={patient_id}")
+            driver.get(f"{BASE_URL}/frontend_php_backup/admin/patient-detail.php?id={patient_id}")
             wait.until(EC.presence_of_element_located((By.NAME, "procedure_id")))
             
             # Select procedure 1 and Intervention group
@@ -627,7 +627,7 @@ def run_tests():
             driver.get(f"{BASE_URL}/backend/api/auth/logout.php")
             # Clear cookies to be absolutely sure
             driver.delete_all_cookies()
-            driver.get(f"{BASE_URL}/frontend/admin/dashboard.php")
+            driver.get(f"{BASE_URL}/frontend_php_backup/admin/dashboard.php")
             time.sleep(1)
             
             curr_url = driver.current_url

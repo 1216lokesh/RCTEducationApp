@@ -15,7 +15,11 @@ define('DB_PORT', getenv('DB_PORT') ?: 3306);
 define('APP_NAME', 'RCT Education Portal');
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-define('APP_URL', $protocol . $host . '/rct-education-web/frontend');
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+$isBackup = (strpos($requestUri, 'frontend_php_backup') !== false || strpos($scriptName, 'frontend_php_backup') !== false);
+$subfolder = $isBackup ? 'frontend_php_backup' : 'frontend';
+define('APP_URL', $protocol . $host . '/rct-education-web/' . $subfolder);
 define('APP_PATH', dirname(dirname(dirname(__FILE__))));
 
 // Session Settings

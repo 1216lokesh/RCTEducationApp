@@ -336,7 +336,7 @@ def run_all_tests():
     # ----------------------------------------------------
     tc_id = "TC-PAT-01"
     try:
-        res = patient_session.get(f"{BASE_URL}/frontend/patient/dashboard.php")
+        res = patient_session.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php")
         if res.status_code == 200 and "Dashboard" in res.text:
             results[tc_id] = {
                 "status": "Pass",
@@ -355,7 +355,7 @@ def run_all_tests():
     # ----------------------------------------------------
     tc_id = "TC-PAT-02"
     try:
-        res = patient_session.post(f"{BASE_URL}/frontend/patient/consent.php", data={"agree": "yes"})
+        res = patient_session.post(f"{BASE_URL}/frontend_php_backup/patient/consent.php", data={"agree": "yes"})
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -379,7 +379,7 @@ def run_all_tests():
             "q2": "No pain",
             "q3": "Yes"
         }
-        res = patient_session.post(f"{BASE_URL}/frontend/patient/baseline.php?apt=1", data=baseline_data)
+        res = patient_session.post(f"{BASE_URL}/frontend_php_backup/patient/baseline.php?apt=1", data=baseline_data)
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -408,7 +408,7 @@ def run_all_tests():
             "q4": 3,
             "q5": 2
         }
-        res = patient_session.post(f"{BASE_URL}/frontend/patient/anxiety.php?apt=1", data=anxiety_data)
+        res = patient_session.post(f"{BASE_URL}/frontend_php_backup/patient/anxiety.php?apt=1", data=anxiety_data)
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -427,7 +427,7 @@ def run_all_tests():
     # ----------------------------------------------------
     tc_id = "TC-PAT-05"
     try:
-        res = patient_session.get(f"{BASE_URL}/frontend/patient/education.php?apt=1")
+        res = patient_session.get(f"{BASE_URL}/frontend_php_backup/patient/education.php?apt=1")
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -451,7 +451,7 @@ def run_all_tests():
             "q2": 1,
             "q3": 1
         }
-        res = patient_session.post(f"{BASE_URL}/frontend/patient/quiz.php?apt=1", data=quiz_data)
+        res = patient_session.post(f"{BASE_URL}/frontend_php_backup/patient/quiz.php?apt=1", data=quiz_data)
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -470,7 +470,7 @@ def run_all_tests():
     # ----------------------------------------------------
     tc_id = "TC-PAT-07"
     try:
-        res = patient_session.get(f"{BASE_URL}/frontend/patient/postop.php")
+        res = patient_session.get(f"{BASE_URL}/frontend_php_backup/patient/postop.php")
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -496,7 +496,7 @@ def run_all_tests():
             "q4": 5,
             "q5": 4
         }
-        res = patient_session.post(f"{BASE_URL}/frontend/patient/satisfaction.php", data=satisfaction_data)
+        res = patient_session.post(f"{BASE_URL}/frontend_php_backup/patient/satisfaction.php", data=satisfaction_data)
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -518,7 +518,7 @@ def run_all_tests():
     # ----------------------------------------------------
     tc_id = "TC-ADM-01"
     try:
-        res = admin_session.get(f"{BASE_URL}/frontend/admin/dashboard.php")
+        res = admin_session.get(f"{BASE_URL}/frontend_php_backup/admin/dashboard.php")
         if res.status_code == 200 and "Dashboard" in res.text:
             results[tc_id] = {
                 "status": "Pass",
@@ -537,7 +537,7 @@ def run_all_tests():
     # ----------------------------------------------------
     tc_id = "TC-ADM-02"
     try:
-        res = admin_session.get(f"{BASE_URL}/frontend/admin/patients.php?search=Dast")
+        res = admin_session.get(f"{BASE_URL}/frontend_php_backup/admin/patients.php?search=Dast")
         if res.status_code == 200:
             results[tc_id] = {
                 "status": "Pass",
@@ -556,7 +556,7 @@ def run_all_tests():
     # ----------------------------------------------------
     tc_id = "TC-ADM-03"
     try:
-        res = admin_session.get(f"{BASE_URL}/frontend/admin/patient-detail.php?id={patient_id}")
+        res = admin_session.get(f"{BASE_URL}/frontend_php_backup/admin/patient-detail.php?id={patient_id}")
         if res.status_code == 200 and "Patient Details" in res.text or "Dast" in res.text:
             results[tc_id] = {
                 "status": "Pass",
@@ -646,7 +646,7 @@ def run_all_tests():
     tc_id = "TC-SEC-01"
     try:
         anon_session = requests.Session()
-        res = anon_session.get(f"{BASE_URL}/frontend/patient/dashboard.php", allow_redirects=False)
+        res = anon_session.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php", allow_redirects=False)
         # Auth::requireLogin redirects to login page. That means either a 302/301 status, or the response content directs to login.
         if res.status_code in [301, 302] or "login.php" in res.headers.get("Location", ""):
             results[tc_id] = {
@@ -655,7 +655,7 @@ def run_all_tests():
             }
         else:
             # Also check if it resolved to login content if redirects are allowed
-            res_fol = anon_session.get(f"{BASE_URL}/frontend/patient/dashboard.php")
+            res_fol = anon_session.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php")
             if "login" in res_fol.url or "Login" in res_fol.text:
                 results[tc_id] = {
                     "status": "Pass",
@@ -675,14 +675,14 @@ def run_all_tests():
     tc_id = "TC-SEC-02"
     try:
         # Request admin page using patient session
-        res = patient_session.get(f"{BASE_URL}/frontend/admin/dashboard.php", allow_redirects=False)
+        res = patient_session.get(f"{BASE_URL}/frontend_php_backup/admin/dashboard.php", allow_redirects=False)
         if res.status_code == 403 or (res.status_code in [301, 302] and "Access Denied" in res.text):
             results[tc_id] = {
                 "status": "Pass",
                 "actual": f"Patient access restricted. HTTP {res.status_code}. Message: Access Denied."
             }
         else:
-            res_fol = patient_session.get(f"{BASE_URL}/frontend/admin/dashboard.php")
+            res_fol = patient_session.get(f"{BASE_URL}/frontend_php_backup/admin/dashboard.php")
             if res_fol.status_code == 403 or "Access Denied" in res_fol.text:
                 results[tc_id] = {
                     "status": "Pass",

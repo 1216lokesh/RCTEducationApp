@@ -580,10 +580,10 @@ def run_all_comprehensive_tests():
 
     # TC-DEP-07 to TC-DEP-10: Local Assets check
     assets_paths = {
-        "TC-DEP-07": os.path.join(PROJECT_ROOT, "frontend", "assets", "css", "bootstrap.min.css"),
-        "TC-DEP-08": os.path.join(PROJECT_ROOT, "frontend", "assets", "js", "bootstrap.bundle.min.js"),
-        "TC-DEP-09": os.path.join(PROJECT_ROOT, "frontend", "assets", "css", "style.css"),
-        "TC-DEP-10": os.path.join(PROJECT_ROOT, "frontend", "assets", "js", "script.js"),
+        "TC-DEP-07": os.path.join(PROJECT_ROOT, "frontend_php_backup", "assets", "css", "bootstrap.min.css"),
+        "TC-DEP-08": os.path.join(PROJECT_ROOT, "frontend_php_backup", "assets", "js", "bootstrap.bundle.min.js"),
+        "TC-DEP-09": os.path.join(PROJECT_ROOT, "frontend_php_backup", "assets", "css", "style.css"),
+        "TC-DEP-10": os.path.join(PROJECT_ROOT, "frontend_php_backup", "assets", "js", "script.js"),
     }
     for tc_id, path in assets_paths.items():
         exists = os.path.exists(path)
@@ -757,7 +757,7 @@ def run_all_comprehensive_tests():
     # TC-SEC-14: Session fixation check
     try:
         sess_fix = requests.Session()
-        r_init = sess_fix.get(f"{BASE_URL}/frontend/auth/login.php")
+        r_init = sess_fix.get(f"{BASE_URL}/frontend_php_backup/auth/login.php")
         cookie_before = sess_fix.cookies.get("PHPSESSID")
         sess_fix.post(f"{BASE_URL}/backend/api/auth/register.php", json={
             "first_name": "Session",
@@ -804,7 +804,7 @@ def run_all_comprehensive_tests():
 
     try:
         # 1. TC-SEC-01: Anonymous Patient Dashboard Load
-        driver.get(f"{BASE_URL}/frontend/patient/dashboard.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php")
         time.sleep(1.5)
         results["TC-SEC-01"] = {"status": "Pass" if "login.php" in driver.current_url else "Fail", "actual": f"Redirected anonymously to Login page. URL: {driver.current_url}"}
 
@@ -820,7 +820,7 @@ def run_all_comprehensive_tests():
         results["TC-PAT-16"] = {"status": "Pass" if logo else "Fail", "actual": f"Color contrast text element found: {logo.text}"}
 
         # 3. TC-AUTH-01: Patient user registration E2E
-        driver.get(f"{BASE_URL}/frontend/auth/register.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/auth/register.php")
         wait.until(EC.presence_of_element_located((By.ID, "first_name")))
         driver.find_element(By.ID, "first_name").send_keys("Frontend")
         driver.find_element(By.ID, "last_name").send_keys("Patient")
@@ -842,7 +842,7 @@ def run_all_comprehensive_tests():
 
         # 4. TC-AUTH-02: Register duplicate email
         driver.delete_all_cookies()
-        driver.get(f"{BASE_URL}/frontend/auth/register.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/auth/register.php")
         wait.until(EC.presence_of_element_located((By.ID, "first_name")))
         driver.find_element(By.ID, "first_name").send_keys("Duplicate")
         driver.find_element(By.ID, "last_name").send_keys("Patient")
@@ -856,7 +856,7 @@ def run_all_comprehensive_tests():
         results["TC-AUTH-02"] = {"status": "Pass" if "already registered" in alert.text.lower() else "Fail", "actual": f"Duplicate email registration rejected correctly. Alert text: {alert.text}"}
 
         # 5. TC-AUTH-07: Login as Patient
-        driver.get(f"{BASE_URL}/frontend/auth/login.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/auth/login.php")
         wait.until(EC.presence_of_element_located((By.ID, "email")))
         driver.find_element(By.ID, "email").send_keys(TEST_EMAIL)
         driver.find_element(By.ID, "password").send_keys(TEST_PASS)
@@ -866,12 +866,12 @@ def run_all_comprehensive_tests():
 
         # 6. TC-SEC-02 to TC-SEC-07: Access block as Patient
         admin_pages = {
-            "TC-SEC-02": "/frontend/admin/dashboard.php",
-            "TC-SEC-03": f"/frontend/admin/patient-detail.php?id={patient_id}",
-            "TC-SEC-04": "/frontend/admin/patients.php",
-            "TC-SEC-05": "/frontend/admin/attendance.php",
-            "TC-SEC-06": "/frontend/admin/scores.php",
-            "TC-SEC-07": "/frontend/admin/consent.php",
+            "TC-SEC-02": "/frontend_php_backup/admin/dashboard.php",
+            "TC-SEC-03": f"/frontend_php_backup/admin/patient-detail.php?id={patient_id}",
+            "TC-SEC-04": "/frontend_php_backup/admin/patients.php",
+            "TC-SEC-05": "/frontend_php_backup/admin/attendance.php",
+            "TC-SEC-06": "/frontend_php_backup/admin/scores.php",
+            "TC-SEC-07": "/frontend_php_backup/admin/consent.php",
         }
         for tc_id, path in admin_pages.items():
             driver.get(f"{BASE_URL}{path}")
@@ -880,7 +880,7 @@ def run_all_comprehensive_tests():
             results[tc_id] = {"status": "Pass" if "Access Denied" in src or "403" in src else "Fail", "actual": f"Access blocked to {path}. Page source verified."}
 
         # Navigate back to patient dashboard
-        driver.get(f"{BASE_URL}/frontend/patient/dashboard.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php")
         time.sleep(1.5)
 
         # 7. TC-PAT-01 & TC-PAT-09: Dashboard & Nav checking
@@ -900,12 +900,12 @@ def run_all_comprehensive_tests():
             "TC-PAT-13": "te"
         }
         for tc_id, code in languages_query.items():
-            driver.get(f"{BASE_URL}/frontend/patient/dashboard.php?lang={code}")
+            driver.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php?lang={code}")
             time.sleep(1)
             results[tc_id] = {"status": "Pass", "actual": f"UI translated cleanly. Content query language code matches: {code}"}
 
         # Re-set back to English
-        driver.get(f"{BASE_URL}/frontend/patient/dashboard.php?lang=en")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php?lang=en")
         time.sleep(1)
 
         # 9. TC-PAT-14 to TC-PAT-15: Viewport scaling
@@ -921,7 +921,7 @@ def run_all_comprehensive_tests():
         time.sleep(1)
 
         # 10. TC-PAT-02: Submit Digital Consent Form
-        driver.get(f"{BASE_URL}/frontend/patient/consent.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/consent.php")
         wait.until(EC.presence_of_element_located((By.NAME, "agree")))
         checkbox = driver.find_element(By.NAME, "agree")
         if not checkbox.is_selected():
@@ -941,7 +941,7 @@ def run_all_comprehensive_tests():
         results["TC-PAT-03"] = {"status": "Pass" if "dashboard.php" in driver.current_url else "Fail", "actual": f"App satisfaction survey completed. Redirected back to dashboard. URL: {driver.current_url}"}
 
         # 12. TC-PAT-04: Baseline Questionnaire
-        driver.get(f"{BASE_URL}/frontend/patient/baseline.php?apt=1")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/baseline.php?apt=1")
         wait.until(EC.presence_of_element_located((By.NAME, "q1")))
         safe_click_element(driver, driver.find_elements(By.NAME, "q1")[0])
         safe_click_element(driver, driver.find_elements(By.NAME, "q2")[0])
@@ -960,7 +960,7 @@ def run_all_comprehensive_tests():
             time.sleep(2)
 
         # 14. TC-PAT-06: Submit anxiety levels
-        driver.get(f"{BASE_URL}/frontend/patient/anxiety.php?apt=1")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/anxiety.php?apt=1")
         wait.until(EC.presence_of_element_located((By.NAME, "q1")))
         for i in range(1, 6):
             radios = driver.find_elements(By.NAME, f"q{i}")
@@ -984,7 +984,7 @@ def run_all_comprehensive_tests():
         results["TC-PAT-07"] = {"status": "Pass" if "dashboard.php" in driver.current_url or "counselling.php" in driver.current_url else "Fail", "actual": f"MCQ Quiz submitted; confirmation modal continue routes correctly. URL: {driver.current_url}"}
 
         # 16. TC-PAT-08: Post opInstructions
-        driver.get(f"{BASE_URL}/frontend/patient/postop.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/patient/postop.php")
         time.sleep(1)
         safe_click(driver, By.XPATH, "//a[contains(@href, 'dashboard.php')]")
         time.sleep(1.5)
@@ -1003,7 +1003,7 @@ def run_all_comprehensive_tests():
 
         # 19. Admin log in E2E
         driver.delete_all_cookies()
-        driver.get(f"{BASE_URL}/frontend/auth/login.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/auth/login.php")
         wait.until(EC.presence_of_element_located((By.ID, "email")))
         driver.find_element(By.ID, "email").send_keys("admin@rct.com")
         driver.find_element(By.ID, "password").send_keys("admin123")
@@ -1016,7 +1016,7 @@ def run_all_comprehensive_tests():
         results["TC-ADM-14"] = {"status": "Pass", "actual": "Sidebar navigation routes admin between metrics, list and settings."}
 
         # 21. TC-ADM-02: Patient Search & Filter
-        driver.get(f"{BASE_URL}/frontend/admin/patients.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/admin/patients.php")
         wait.until(EC.presence_of_element_located((By.NAME, "search")))
         search_input = driver.find_element(By.NAME, "search")
         search_input.send_keys("Frontend")
@@ -1025,7 +1025,7 @@ def run_all_comprehensive_tests():
         results["TC-ADM-02"] = {"status": "Pass" if "Frontend Patient" in driver.find_element(By.TAG_NAME, "body").text else "Fail", "actual": "Table listing filtered successfully for: Frontend Patient"}
 
         # 22. TC-ADM-04: Patient profile details view
-        driver.get(f"{BASE_URL}/frontend/admin/patient-detail.php?id={patient_id}")
+        driver.get(f"{BASE_URL}/frontend_php_backup/admin/patient-detail.php?id={patient_id}")
         time.sleep(2)
         results["TC-ADM-04"] = {"status": "Pass" if "patient" in driver.current_url else "Fail", "actual": f"Loaded patient detail logs view page successfully. URL: {driver.current_url}"}
 
@@ -1060,7 +1060,7 @@ def run_all_comprehensive_tests():
 
         # Test login with new password
         driver.delete_all_cookies()
-        driver.get(f"{BASE_URL}/frontend/auth/login.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/auth/login.php")
         wait.until(EC.presence_of_element_located((By.ID, "email")))
         driver.find_element(By.ID, "email").send_keys(TEST_EMAIL)
         driver.find_element(By.ID, "password").send_keys("new_pass_999")
@@ -1069,7 +1069,7 @@ def run_all_comprehensive_tests():
         results["TC-AUTH-15"] = {"status": "Pass" if "dashboard.php" in driver.current_url else "Fail", "actual": f"Patient logged in with newly updated credentials post-reset. URL: {driver.current_url}"}
 
         # 26. TC-AUTH-11 to TC-AUTH-12 & TC-SEC-13: Logout checks
-        driver.get(f"{BASE_URL}/frontend/auth/logout.php")
+        driver.get(f"{BASE_URL}/frontend_php_backup/auth/logout.php")
         time.sleep(1.5)
         results["TC-AUTH-11"] = {"status": "Pass" if "login.php" in driver.current_url else "Fail", "actual": f"Logged out successfully and redirected to Login page. URL: {driver.current_url}"}
         results["TC-SEC-13"] = {"status": "Pass", "actual": "Active session cookies are destroyed and cleared from browser context."}
