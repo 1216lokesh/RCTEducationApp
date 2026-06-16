@@ -17,20 +17,21 @@ sys.path.append(os.path.dirname(__file__))
 import generate_excel
 
 # Base URL definition
-BASE_URL = "http://localhost/rct-education-web"
+BASE_URL = os.environ.get("BASE_URL", "http://localhost/rct-education-web")
 
 def execute_mysql_query(query):
-    """Executes a MySQL query using the xampp mysql binary and returns lines of stdout."""
-    cmd = [
-        "c:\\xampp\\mysql\\bin\\mysql.exe",
-        "-u", "root",
-        "-e", query
-    ]
+    """Executes a MySQL query dynamically choosing the client and host."""
+    import shutil
+    mysql_bin = shutil.which("mysql") or ("c:\\xampp\\mysql\\bin\\mysql.exe" if os.path.exists("c:\\xampp\\mysql\\bin\\mysql.exe") else "mysql")
+    cmd = [mysql_bin]
+    host = os.environ.get("DB_HOST")
+    if host:
+        cmd.extend(["-h", host])
+    cmd.extend(["-u", "root", "-e", query])
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         return [line.strip() for line in output.split('\n') if line.strip()]
-    except Exception as e:
-        # Fallback/Log
+    except Exception:
         return []
 
 def get_user_id_by_email(email):
@@ -63,41 +64,35 @@ def db_cleanup(email):
 
 def update_csv_file(results):
     csv_path = os.path.join(os.path.dirname(__file__), "test_cases.csv")
-    if not os.path.exists(csv_path):
-        print(f"CSV file not found at: {csv_path}")
-        return
-    
     import csv
-    # Read existing rows
-    rows = []
+    
+    # Load cases dynamically to populate columns
     try:
-        with open(csv_path, 'r', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            rows = list(reader)
+        test_cases = generate_excel.create_excel_sheet(return_cases=True)
     except Exception as e:
-        print(f"Error reading CSV: {e}")
+        print(f"Error fetching test cases for CSV: {e}")
         return
-        
-    if not rows:
-        return
-        
-    # Search and update Actual Result (index 7) and Status (index 8)
-    for row in rows[1:]:
-        if len(row) > 0:
-            tc_id = row[0].strip('"').strip()
-            if tc_id in results:
-                if len(row) > 8:
-                    row[7] = results[tc_id].get("actual", "")
-                    row[8] = results[tc_id].get("status", "")
-            
-    # Write back
+
+    headers = [
+        "Test Case ID", "Feature / Module", "Sub-feature", 
+        "Test Case Description", "Pre-conditions", "Test Steps", 
+        "Expected Result", "Actual Result", "Status (Pass/Fail)", "Priority"
+    ]
+
     try:
         with open(csv_path, 'w', encoding='utf-8', newline='') as f:
             writer = csv.writer(f)
-            writer.writerows(rows)
-        print(f"CSV file updated successfully at: {csv_path}")
+            writer.writerow(headers)
+            for tc in test_cases:
+                res = results.get(tc["id"], {})
+                writer.writerow([
+                    tc["id"], tc["module"], tc["sub"], tc["desc"], tc["pre"],
+                    tc["steps"], tc["expected"], res.get("actual", ""),
+                    res.get("status", ""), tc["priority"]
+                ])
+        print(f"CSV file created successfully at: {csv_path}")
     except Exception as e:
-        print(f"Error writing CSV: {e}")
+        print(f"Error writing CSV file: {e}")
 
 def run_all_tests():
     print("==================================================")

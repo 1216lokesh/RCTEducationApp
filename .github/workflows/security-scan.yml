@@ -76,28 +76,28 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests openpyxl selenium
+          pip install requests openpyxl
 
-      - name: Run Comprehensive Security & QA Tests
+      - name: Run Backend Security & QA Tests
         run: |
           cd rct-education-web/backend/automated_tests
-          python run_comprehensive_tests.py
+          python run_tests.py
         env:
           BASE_URL: "http://127.0.0.1:8000/rct-education-web"
           DB_HOST: "127.0.0.1"
 
-      - name: Upload Comprehensive Test Excel Report
+      - name: Upload QA Test Excel Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: comprehensive-qa-report-excel
-          path: rct-education-web/backend/automated_tests/comprehensive_test_cases.xlsx
+          name: backend-qa-report-excel
+          path: rct-education-web/backend/automated_tests/test_cases.xlsx
           if-no-files-found: warn
 
-      - name: Upload Comprehensive Test CSV Report
+      - name: Upload QA Test CSV Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: comprehensive-qa-report-csv
-          path: rct-education-web/backend/automated_tests/comprehensive_test_cases.csv
+          name: backend-qa-report-csv
+          path: rct-education-web/backend/automated_tests/test_cases.csv
           if-no-files-found: warn
