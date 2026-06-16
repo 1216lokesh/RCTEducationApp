@@ -29,6 +29,11 @@ jobs:
 
       - name: Import Database Schema
         run: |
+          for i in {1..30}; do
+            mysqladmin ping -h 127.0.0.1 -u root --silent && break
+            echo "Waiting for MySQL database connection..."
+            sleep 1
+          done
           mysql -h 127.0.0.1 -u root rct_app < rct-education-web/backend/config/schema_rct_app.sql
 
       - name: Start Local PHP Web Server
