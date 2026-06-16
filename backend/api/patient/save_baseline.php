@@ -1,20 +1,38 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+
+if (!$auth->isLoggedIn()) {
+    sendJsonResponse(["status" => "error", "message" => "Not authenticated"], 401);
+}
+
+$currentUser = $auth->getCurrentUser();
+$patient_id = intval($currentUser['id']);
+
 header('Content-Type: application/json');
 
+$conn = $db->getConnection();
+
 $data = json_decode(file_get_contents("php://input"), true);
-$patient_id   = $conn->real_escape_string($data['patient_id']);
-$appointment  = $conn->real_escape_string($data['appointment']);
-$q1           = $conn->real_escape_string($data['q1']);
-$q2           = $conn->real_escape_string($data['q2']);
-$q3           = $conn->real_escape_string($data['q3']);
+if (!$data) {
+    echo json_encode(["status" => "error", "message" => "No input"]);
+    exit;
+}
 
-$sql = "INSERT INTO baseline_responses (patient_id, appointment, q1, q2, q3, created_at)
-        VALUES ('$patient_id', '$appointment', '$q1', '$q2', '$q3', NOW())";
+$appointment  = $data['appointment'];
+$q1           = $data['q1'];
+$q2           = $data['q2'];
+$q3           = $data['q3'];
 
-if ($conn->query($sql)) {
+$stmt = $conn->prepare(
+    "INSERT INTO baseline_responses (patient_id, appointment, q1, q2, q3, created_at)
+     VALUES (?, ?, ?, ?, ?, NOW())"
+);
+$stmt->bind_param("issss", $patient_id, $appointment, $q1, $q2, $q3);
+
+if ($stmt->execute()) {
     echo json_encode(["status" => "success"]);
 } else {
-    echo json_encode(["status" => "error", "message" => $conn->error]);
+    echo json_encode(["status" => "error", "message" => $stmt->error]);
 }
+$stmt->close();
 ?>

@@ -1,7 +1,9 @@
 <?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+Auth::requireRole('admin');
+$conn = $db->getConnection();
 
 $result = $conn->query(
     "SELECT u.name, c.consent_given, c.consent_date 

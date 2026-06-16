@@ -1,6 +1,9 @@
 <?php
 header("Content-Type: application/json");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+Auth::requireRole('admin');
+$conn = $db->getConnection();
+
 
 $result = $conn->query(
     "SELECT 

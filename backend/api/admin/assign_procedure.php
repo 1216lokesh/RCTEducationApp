@@ -1,6 +1,8 @@
 <?php
 header("Content-Type: application/json");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+Auth::requireRole('admin');
+$conn = $db->getConnection();
 
 $data         = json_decode(file_get_contents("php://input"), true);
 
@@ -10,37 +12,44 @@ if (!$data) {
     exit;
 }
 
-$patient_id   = $conn->real_escape_string($data["patient_id"]);
-$procedure_id = $conn->real_escape_string($data["procedure_id"]);
-$assigned_by  = $conn->real_escape_string($data["assigned_by"]);
-$group_type   = $conn->real_escape_string($data["group_type"]);
+$patient_id   = intval($data["patient_id"]);
+$procedure_id = intval($data["procedure_id"]);
+$assigned_by  = intval($data["assigned_by"]);
+$group_type   = $data["group_type"];
 $date         = date("Y-m-d");
 
 // Check if already assigned
-$check = $conn->query(
-    "SELECT id FROM patient_procedure 
-     WHERE patient_id='$patient_id'"
-);
+$stmt_check = $conn->prepare("SELECT id FROM patient_procedure WHERE patient_id=?");
+$stmt_check->bind_param("i", $patient_id);
+$stmt_check->execute();
+$check = $stmt_check->get_result();
 
 if ($check->num_rows > 0) {
-    $sql = "UPDATE patient_procedure 
-            SET procedure_id='$procedure_id',
-                assigned_by='$assigned_by',
-                group_type='$group_type',
-                assigned_date='$date'
-            WHERE patient_id='$patient_id'";
+    $stmt_write = $conn->prepare(
+        "UPDATE patient_procedure 
+         SET procedure_id=?,
+             assigned_by=?,
+             group_type=?,
+             assigned_date=?
+         WHERE patient_id=?"
+    );
+    $stmt_write->bind_param("iissi", $procedure_id, $assigned_by, $group_type, $date, $patient_id);
 } else {
-    $sql = "INSERT INTO patient_procedure 
-            (patient_id, procedure_id, assigned_by, 
-             group_type, assigned_date)
-            VALUES ('$patient_id','$procedure_id',
-                    '$assigned_by','$group_type','$date')";
+    $stmt_write = $conn->prepare(
+        "INSERT INTO patient_procedure 
+         (patient_id, procedure_id, assigned_by, 
+          group_type, assigned_date)
+         VALUES (?, ?, ?, ?, ?)"
+    );
+    $stmt_write->bind_param("iiiss", $patient_id, $procedure_id, $assigned_by, $group_type, $date);
 }
+$stmt_check->close();
 
-if ($conn->query($sql)) {
+if ($stmt_write->execute()) {
     echo json_encode(["status" => "success"]);
 } else {
     echo json_encode(["status" => "error",
-                      "message" => $conn->error]);
+                      "message" => $stmt_write->error]);
 }
+$stmt_write->close();
 ?>

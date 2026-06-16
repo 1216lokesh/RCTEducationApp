@@ -1,9 +1,10 @@
 <?php
 error_reporting(0);
 ini_set('display_errors', 0);
-header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+Auth::requireRole('admin');
+$conn = $db->getConnection();
 include __DIR__ . "/../auth/PHPMailer.php";
 include __DIR__ . "/../auth/SMTP.php";
 include __DIR__ . "/../auth/Exception.php";
@@ -21,23 +22,31 @@ if (!$data || !isset($data["user_id"])) {
     exit;
 }
 
-$user_id = $conn->real_escape_string($data["user_id"]);
+$user_id = intval($data["user_id"]);
 
-$result = $conn->query("SELECT name, email FROM users WHERE id='$user_id'");
+$stmt_check = $conn->prepare("SELECT name, email FROM users WHERE id=?");
+$stmt_check->bind_param("i", $user_id);
+$stmt_check->execute();
+$result = $stmt_check->get_result();
 
 if (!$result || $result->num_rows === 0) {
     echo json_encode(["status" => "error", "message" => "Patient not found", "user_id" => $user_id]);
+    $stmt_check->close();
     exit;
 }
 
 $user   = $result->fetch_assoc();
 $email  = $user["email"];
 $name   = $user["name"];
+$stmt_check->close();
 
 $otp    = rand(100000, 999999);
 $expiry = date("Y-m-d H:i:s", strtotime("+10 minutes"));
 
-$conn->query("UPDATE users SET otp='$otp', otp_expiry='$expiry' WHERE id='$user_id'");
+$stmt_write = $conn->prepare("UPDATE users SET otp=?, otp_expiry=? WHERE id=?");
+$stmt_write->bind_param("ssi", $otp, $expiry, $user_id);
+$stmt_write->execute();
+$stmt_write->close();
 
 $mail = new PHPMailer(true);
 try {

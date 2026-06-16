@@ -1,7 +1,9 @@
 <?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+Auth::requireRole('admin');
+$conn = $db->getConnection();
 
 $sql = "SELECT u.name, s.quiz1, s.quiz2, s.quiz3 
         FROM scores s 

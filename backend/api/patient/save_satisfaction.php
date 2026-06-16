@@ -1,6 +1,15 @@
 <?php
 header("Content-Type: application/json");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+
+if (!$auth->isLoggedIn()) {
+    sendJsonResponse(["status" => "error", "message" => "Not authenticated"], 401);
+}
+
+$currentUser = $auth->getCurrentUser();
+$patient_id = intval($currentUser['id']);
+
+$conn = $db->getConnection();
 
 $data         = json_decode(file_get_contents("php://input"), true);
 
@@ -10,35 +19,44 @@ if (!$data) {
     exit;
 }
 
-$patient_id   = $conn->real_escape_string($data["patient_id"]);
-$procedure_id = $conn->real_escape_string($data["procedure_id"]);
-$timepoint    = $conn->real_escape_string($data["timepoint"]);
-$score        = $conn->real_escape_string($data["score"]);
+$procedure_id = intval($data["procedure_id"]);
+$timepoint    = $data["timepoint"];
+$score        = intval($data["score"]);
 
-$check = $conn->query(
+$stmt_check = $conn->prepare(
     "SELECT id FROM satisfaction_scores 
-     WHERE patient_id='$patient_id'
-     AND procedure_id='$procedure_id'
-     AND timepoint='$timepoint'"
+     WHERE patient_id=?
+     AND procedure_id=?
+     AND timepoint=?"
 );
+$stmt_check->bind_param("iis", $patient_id, $procedure_id, $timepoint);
+$stmt_check->execute();
+$check = $stmt_check->get_result();
 
 if ($check->num_rows > 0) {
-    $sql = "UPDATE satisfaction_scores 
-            SET score='$score'
-            WHERE patient_id='$patient_id'
-            AND procedure_id='$procedure_id'
-            AND timepoint='$timepoint'";
+    $stmt_write = $conn->prepare(
+        "UPDATE satisfaction_scores 
+         SET score=?
+         WHERE patient_id=?
+         AND procedure_id=?
+         AND timepoint=?"
+    );
+    $stmt_write->bind_param("iiis", $score, $patient_id, $procedure_id, $timepoint);
 } else {
-    $sql = "INSERT INTO satisfaction_scores 
-            (patient_id, procedure_id, timepoint, score)
-            VALUES ('$patient_id','$procedure_id',
-                    '$timepoint','$score')";
+    $stmt_write = $conn->prepare(
+        "INSERT INTO satisfaction_scores 
+         (patient_id, procedure_id, timepoint, score)
+         VALUES (?, ?, ?, ?)"
+    );
+    $stmt_write->bind_param("iisi", $patient_id, $procedure_id, $timepoint, $score);
 }
+$stmt_check->close();
 
-if ($conn->query($sql)) {
+if ($stmt_write->execute()) {
     echo json_encode(["status" => "success"]);
 } else {
     echo json_encode(["status" => "error",
-                      "message" => $conn->error]);
+                      "message" => $stmt_write->error]);
 }
+$stmt_write->close();
 ?>

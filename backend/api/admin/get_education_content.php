@@ -1,7 +1,9 @@
 <?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
+Auth::requireRole('admin');
+$conn = $db->getConnection();
 
 $data        = json_decode(file_get_contents("php://input"), true);
 $procedure_id = $conn->real_escape_string($data["procedure_id"]);

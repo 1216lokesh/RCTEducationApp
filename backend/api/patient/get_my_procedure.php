@@ -1,18 +1,17 @@
 <?php
 header("Content-Type: application/json");
-require_once __DIR__ . '/../bootstrap.php'; $conn = $db->getConnection();
+require_once __DIR__ . '/../bootstrap.php';
 
-$data       = json_decode(file_get_contents("php://input"), true);
-
-if (!$data) {
-    echo json_encode(["status" => "error",
-                      "message" => "No input"]);
-    exit;
+if (!$auth->isLoggedIn()) {
+    sendJsonResponse(["status" => "error", "message" => "Not authenticated"], 401);
 }
 
-$patient_id = $conn->real_escape_string($data["patient_id"]);
+$currentUser = $auth->getCurrentUser();
+$patient_id = intval($currentUser['id']);
 
-$result = $conn->query(
+$conn = $db->getConnection();
+
+$stmt = $conn->prepare(
     "SELECT 
         pp.id,
         pp.procedure_id,
@@ -23,9 +22,13 @@ $result = $conn->query(
         pr.description
      FROM patient_procedure pp
      JOIN procedures pr ON pp.procedure_id = pr.id
-     WHERE pp.patient_id = '$patient_id'
+     WHERE pp.patient_id = ?
      LIMIT 1"
 );
+
+$stmt->bind_param("i", $patient_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -39,4 +42,5 @@ if ($result->num_rows > 0) {
         "message" => "No procedure assigned"
     ]);
 }
+$stmt->close();
 ?>
