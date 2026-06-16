@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
       }
-    } catch (err) {
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);

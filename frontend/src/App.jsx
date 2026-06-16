@@ -1,4 +1,3 @@
-import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -24,25 +23,6 @@ import Followup1Week from './pages/patient/Followup1Week';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminPatients from './pages/admin/Patients';
 import AdminPatientDetail from './pages/admin/PatientDetail';
-
-// Route helper to check login status
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="flex-center full-screen">
-        <div className="loading-spinner"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-}
 
 // Route helper to check roles
 function RoleProtectedRoute({ children, allowedRole }) {
