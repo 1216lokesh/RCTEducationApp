@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { Builder, By, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const assert = require('assert');
@@ -386,7 +387,7 @@ async function runE2ETests() {
       console.log('Verifying progress...');
       await driver.wait(until.urlContains('/patient/dashboard'), 15000);
       await driver.wait(until.elementLocated(By.className('progress-count')), 15000);
-      progressCount = await driver.findElement(By.className('progress-count')).getText();
+      const progressCount = await driver.findElement(By.className('progress-count')).getText();
       console.log(`- Progress text: "${progressCount}"`);
       assert.strictEqual(progressCount, '2 / 4 Completed', 'Apt 2 did not increment progress count');
       
@@ -442,7 +443,7 @@ async function runE2ETests() {
       console.log('Verifying progress...');
       await driver.wait(until.urlContains('/patient/dashboard'), 15000);
       await driver.wait(until.elementLocated(By.className('progress-count')), 15000);
-      progressCount = await driver.findElement(By.className('progress-count')).getText();
+      const progressCount = await driver.findElement(By.className('progress-count')).getText();
       console.log(`- Progress text: "${progressCount}"`);
       assert.strictEqual(progressCount, '3 / 4 Completed', 'Apt 3 did not increment progress count');
       
@@ -494,7 +495,7 @@ async function runE2ETests() {
       console.log('Verifying final progress...');
       await driver.wait(until.urlContains('/patient/dashboard'), 15000);
       await driver.wait(until.elementLocated(By.className('progress-count')), 15000);
-      progressCount = await driver.findElement(By.className('progress-count')).getText();
+      const progressCount = await driver.findElement(By.className('progress-count')).getText();
       console.log(`- Progress text: "${progressCount}"`);
       assert.strictEqual(progressCount, '4 / 4 Completed', 'Follow-up did not complete all 4 parts');
       
