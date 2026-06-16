@@ -1,7 +1,7 @@
 {
   "TC-FE-AUTH-01": {
     "status": "Pass",
-    "actual": "Successfully registered patient and loaded dashboard: \"Welcome, E2E Patient-1781259183470\""
+    "actual": "Successfully registered patient and loaded dashboard: \"Welcome, E2E Patient-1781599396814\""
   },
   "TC-FE-PAT-01": {
     "status": "Pass",
