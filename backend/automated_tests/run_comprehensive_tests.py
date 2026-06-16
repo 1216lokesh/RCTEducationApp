@@ -805,10 +805,12 @@ def run_all_comprehensive_tests():
     try:
         # 1. TC-SEC-01: Anonymous Patient Dashboard Load
         driver.get(f"{BASE_URL}/frontend_php_backup/patient/dashboard.php")
-        time.sleep(1.5)
+        # Wait until redirected to login page by checking presence of login input field
+        wait.until(EC.presence_of_element_located((By.ID, "email")))
         results["TC-SEC-01"] = {"status": "Pass" if "login.php" in driver.current_url else "Fail", "actual": f"Redirected anonymously to Login page. URL: {driver.current_url}"}
 
         # 2. TC-UI-02 to TC-UI-05: Title, logo, nav elements checks on Login page
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "navbar-brand")))
         has_meta_desc = bool(driver.find_elements(By.XPATH, "//meta[@name='description']"))
         results["TC-PAT-17"] = {
             "status": "Pass" if has_meta_desc else "Fail",
@@ -1082,6 +1084,11 @@ def run_all_comprehensive_tests():
 
     except Exception as e:
         print(f"Selenium execution error: {e}")
+        try:
+            print(f"CURRENT URL AT FAILURE: {driver.current_url}")
+            print(f"PAGE SOURCE SAMPLE AT FAILURE:\n{driver.page_source[:3000]}")
+        except Exception as debug_err:
+            print(f"Failed to extract debug info: {debug_err}")
         traceback.print_exc()
     finally:
         driver.quit()
