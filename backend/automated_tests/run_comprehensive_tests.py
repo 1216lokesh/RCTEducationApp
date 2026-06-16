@@ -43,16 +43,19 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
     import requests
 
-BASE_URL = "http://localhost/rct-education-web"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_URL = os.environ.get("BASE_URL", "http://localhost/rct-education-web")
 TEST_EMAIL = "test_frontend_patient@rct.com"
 TEST_PASS = "frontend_pass_123"
 
 def execute_mysql_query(query):
-    cmd = [
-        "c:\\xampp\\mysql\\bin\\mysql.exe",
-        "-u", "root",
-        "-e", query
-    ]
+    import shutil
+    mysql_bin = shutil.which("mysql") or ("c:\\xampp\\mysql\\bin\\mysql.exe" if os.path.exists("c:\\xampp\\mysql\\bin\\mysql.exe") else "mysql")
+    cmd = [mysql_bin]
+    host = os.environ.get("DB_HOST")
+    if host:
+        cmd.extend(["-h", host])
+    cmd.extend(["-u", "root", "-e", query])
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         return [line.strip() for line in output.split('\n') if line.strip()]
@@ -88,7 +91,10 @@ def is_port_open(host, port):
 
 def get_lang_keys(lang):
     try:
-        cmd = ["c:\\xampp\\php\\php.exe", "-r", f"echo json_encode(array_keys(include 'c:/xampp/htdocs/rct-education-web/backend/languages/{lang}.php'));"]
+        import shutil
+        php_bin = shutil.which("php") or ("c:\\xampp\\php\\php.exe" if os.path.exists("c:\\xampp\\php\\php.exe") else "php")
+        lang_file = os.path.join(PROJECT_ROOT, "backend", "languages", f"{lang}.php").replace("\\", "/")
+        cmd = [php_bin, "-r", f"echo json_encode(array_keys(include '{lang_file}'));"]
         res = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         return set(json.loads(res))
     except Exception as e:
@@ -483,7 +489,10 @@ def run_all_comprehensive_tests():
         
     # TC-UNT-04: Compile checks
     try:
-        cmd = ["c:\\xampp\\php\\php.exe", "-l", "c:/xampp/htdocs/rct-education-web/backend/languages/en.php"]
+        import shutil
+        php_bin = shutil.which("php") or ("c:\\xampp\\php\\php.exe" if os.path.exists("c:\\xampp\\php\\php.exe") else "php")
+        en_lang_file = os.path.join(PROJECT_ROOT, "backend", "languages", "en.php").replace("\\", "/")
+        cmd = [php_bin, "-l", en_lang_file]
         out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         results["TC-UNT-04"] = {"status": "Pass", "actual": f"Language file compiled correctly: {out}"}
     except Exception as e:
@@ -491,7 +500,10 @@ def run_all_comprehensive_tests():
 
     # TC-UNT-05 to TC-UNT-08: Database Helpers
     try:
-        cmd = ["c:\\xampp\\php\\php.exe", "-r", "require 'c:/xampp/htdocs/rct-education-web/backend/includes/init.php'; echo get_class($db);"]
+        import shutil
+        php_bin = shutil.which("php") or ("c:\\xampp\\php\\php.exe" if os.path.exists("c:\\xampp\\php\\php.exe") else "php")
+        init_file = os.path.join(PROJECT_ROOT, "backend", "includes", "init.php").replace("\\", "/")
+        cmd = [php_bin, "-r", f"require '{init_file}'; echo get_class($db);"]
         out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         if out == "Database":
             results["TC-UNT-05"] = {"status": "Pass", "actual": "Verified Database class load and escape functionality."}
@@ -503,7 +515,10 @@ def run_all_comprehensive_tests():
 
     # TC-UNT-09 to TC-UNT-12: Auth & Language Classes
     try:
-        cmd = ["c:\\xampp\\php\\php.exe", "-r", "require 'c:/xampp/htdocs/rct-education-web/backend/includes/init.php'; echo get_class($auth);"]
+        import shutil
+        php_bin = shutil.which("php") or ("c:\\xampp\\php\\php.exe" if os.path.exists("c:\\xampp\\php\\php.exe") else "php")
+        init_file = os.path.join(PROJECT_ROOT, "backend", "includes", "init.php").replace("\\", "/")
+        cmd = [php_bin, "-r", f"require '{init_file}'; echo get_class($auth);"]
         out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         if out == "Auth":
             results["TC-UNT-09"] = {"status": "Pass", "actual": "Verified Auth::isLoggedIn evaluation check."}
@@ -515,7 +530,10 @@ def run_all_comprehensive_tests():
 
     # TC-UNT-13 to TC-UNT-15: Config constants & global helpers
     try:
-        cmd = ["c:\\xampp\\php\\php.exe", "-r", "require 'c:/xampp/htdocs/rct-education-web/backend/includes/init.php'; echo APP_NAME;"]
+        import shutil
+        php_bin = shutil.which("php") or ("c:\\xampp\\php\\php.exe" if os.path.exists("c:\\xampp\\php\\php.exe") else "php")
+        init_file = os.path.join(PROJECT_ROOT, "backend", "includes", "init.php").replace("\\", "/")
+        cmd = [php_bin, "-r", f"require '{init_file}'; echo APP_NAME;"]
         out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         if "RCT" in out:
             results["TC-UNT-13"] = {"status": "Pass", "actual": f"Constants parsed correctly in config.php. APP_NAME={out}"}
@@ -539,7 +557,7 @@ def run_all_comprehensive_tests():
     results["TC-DEP-03"] = {"status": "Pass" if len(admins)>1 and int(admins[1])>0 else "Fail", "actual": f"Admin account admin@rct.com exists in database users table."}
 
     # TC-DEP-04: Directory permissions
-    up_dir = "c:\\xampp\\htdocs\\rct-education-web\\backend\\uploads"
+    up_dir = os.path.join(PROJECT_ROOT, "backend", "uploads")
     try:
         if not os.path.exists(up_dir):
             os.makedirs(up_dir)
@@ -552,31 +570,41 @@ def run_all_comprehensive_tests():
         results["TC-DEP-04"] = {"status": "Fail", "actual": f"Directory permission check failed: {e}"}
 
     # TC-DEP-05 to TC-DEP-06: Config parameters
-    with open("c:\\xampp\\htdocs\\rct-education-web\\backend\\config\\config.php", "r", encoding="utf-8") as f:
+    config_file = os.path.join(PROJECT_ROOT, "backend", "config", "config.php")
+    with open(config_file, "r", encoding="utf-8") as f:
         config_src = f.read()
-    results["TC-DEP-05"] = {"status": "Pass" if "define('DB_HOST', 'localhost')" in config_src else "Fail", "actual": "DB_HOST defined as localhost in configuration settings."}
-    results["TC-DEP-06"] = {"status": "Pass" if "define('DB_NAME', 'rct_app')" in config_src else "Fail", "actual": "DB_NAME defined as rct_app in database configuration settings."}
+    # On GitHub actions we dynamically read host, but we verify config syntax contains getenv or DB_HOST config
+    db_host_check = "define('DB_HOST', getenv('DB_HOST') ?: 'localhost')" in config_src or "define('DB_HOST', 'localhost')" in config_src
+    results["TC-DEP-05"] = {"status": "Pass" if db_host_check else "Fail", "actual": "DB_HOST defined correctly in configuration settings."}
+    results["TC-DEP-06"] = {"status": "Pass" if "define('DB_NAME', getenv('DB_NAME') ?: 'rct_app')" in config_src or "define('DB_NAME', 'rct_app')" in config_src else "Fail", "actual": "DB_NAME defined as rct_app in database configuration settings."}
 
     # TC-DEP-07 to TC-DEP-10: Local Assets check
     assets_paths = {
-        "TC-DEP-07": "c:\\xampp\\htdocs\\rct-education-web\\frontend\\assets\\css\\bootstrap.min.css",
-        "TC-DEP-08": "c:\\xampp\\htdocs\\rct-education-web\\frontend\\assets\\js\\bootstrap.bundle.min.js",
-        "TC-DEP-09": "c:\\xampp\\htdocs\\rct-education-web\\frontend\\assets\\css\\style.css",
-        "TC-DEP-10": "c:\\xampp\\htdocs\\rct-education-web\\frontend\\assets\\js\\script.js",
+        "TC-DEP-07": os.path.join(PROJECT_ROOT, "frontend", "assets", "css", "bootstrap.min.css"),
+        "TC-DEP-08": os.path.join(PROJECT_ROOT, "frontend", "assets", "js", "bootstrap.bundle.min.js"),
+        "TC-DEP-09": os.path.join(PROJECT_ROOT, "frontend", "assets", "css", "style.css"),
+        "TC-DEP-10": os.path.join(PROJECT_ROOT, "frontend", "assets", "js", "script.js"),
     }
     for tc_id, path in assets_paths.items():
         exists = os.path.exists(path)
         results[tc_id] = {"status": "Pass" if exists else "Fail", "actual": f"Asset {os.path.basename(path)} exists at: {path}" if exists else f"Missing file: {path}"}
 
     # TC-DEP-11 to TC-DEP-12: Port connectivity
-    results["TC-DEP-11"] = {"status": "Pass" if is_port_open("localhost", 80) else "Fail", "actual": "Port 80 is active. Apache Web Server is online."}
-    results["TC-DEP-12"] = {"status": "Pass" if is_port_open("localhost", 3306) else "Fail", "actual": "Port 3306 is active. MySQL Database Engine is online."}
+    parsed_url = BASE_URL.split("://")[-1].split("/")[0] # e.g. localhost or 127.0.0.1:8000
+    host_port = parsed_url.split(":")
+    web_host = host_port[0]
+    web_port = int(host_port[1]) if len(host_port) > 1 else 80
+    mysql_host = os.environ.get("DB_HOST", "localhost")
+    results["TC-DEP-11"] = {"status": "Pass" if is_port_open(web_host, web_port) else "Fail", "actual": f"Port {web_port} is active. Web Server is online."}
+    results["TC-DEP-12"] = {"status": "Pass" if is_port_open(mysql_host, 3306) else "Fail", "actual": f"Port 3306 is active on {mysql_host}. Database Engine is online."}
 
     # TC-DEP-13 to TC-DEP-15: Environment variable values
     results["TC-DEP-13"] = {"status": "Pass" if "DEFAULT_LANGUAGE" in config_src else "Fail", "actual": "Parsed DEFAULT_LANGUAGE and APP_URL constants successfully."}
     
     try:
-        cmd = ["c:\\xampp\\php\\php.exe", "-r", "echo PHP_VERSION;"]
+        import shutil
+        php_bin = shutil.which("php") or ("c:\\xampp\\php\\php.exe" if os.path.exists("c:\\xampp\\php\\php.exe") else "php")
+        cmd = [php_bin, "-r", "echo PHP_VERSION;"]
         version = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode('utf-8').strip()
         results["TC-DEP-14"] = {"status": "Pass", "actual": f"PHP runtime version is compatible. Version running: {version} (Requires >= 7.4)"}
     except Exception as e:
@@ -761,7 +789,8 @@ def run_all_comprehensive_tests():
 
     # TC-SEC-20: Debug mode database exception safety
     try:
-        with open("c:\\xampp\\htdocs\\rct-education-web\\backend\\includes\\init.php", "r", encoding="utf-8") as f:
+        init_file = os.path.join(PROJECT_ROOT, "backend", "includes", "init.php")
+        with open(init_file, "r", encoding="utf-8") as f:
             init_src = f.read()
         has_handler = "set_error_handler" in init_src
         results["TC-SEC-20"] = {"status": "Pass" if has_handler else "Fail", "actual": "Verified that set_error_handler is configured to intercept and prevent raw error output."}
