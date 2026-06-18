@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Replace this with your actual Render URL after deploying it
-const RENDER_BACKEND_URL = import.meta.env.VITE_API_URL || 'https://rct-education-web.onrender.com';
+// Replace this with your actual Clever Cloud URL
+const RENDER_BACKEND_URL = import.meta.env.VITE_API_URL || 'https://app-2fae98fb-338a-4372-b455-37ea171ae30a.cleverapps.io';
 
 const getApiBaseURL = () => {
   // Allow dynamic runtime override via localStorage (very useful for testing/changing endpoints)
