@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCT Education Portal - QA E2E Test Suite Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --card-bg: rgba(16, 22, 37, 0.65);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --card-hover-bg: rgba(24, 32, 54, 0.85);
+            --card-hover-border: rgba(59, 130, 246, 0.3);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.15);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.12);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.12);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.12);
+            
+            --prio-high: #f43f5e;
+            --prio-med: #f59e0b;
+            --prio-low: #6366f1;
+            
+            --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Layout */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .brand h1 {
+            font-family: var(--font-display);
+            font-size: 2.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 40%, #a5f3fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.025em;
+        }
+
+        .brand p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand p .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .status-badge {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 0.65rem 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .status-badge .badge-icon {
+            font-size: 1.25rem;
+        }
+
+        .status-badge.deployable {
+            border-color: rgba(16, 185, 129, 0.25);
+            background: rgba(16, 185, 129, 0.06);
+            color: var(--success);
+            font-weight: 700;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.non-deployable {
+            border-color: rgba(239, 108, 108, 0.25);
+            background: rgba(239, 68, 68, 0.06);
+            color: var(--danger);
+            font-weight: 700;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            transition: var(--transition);
+        }
+
+        .stat-card.total::before { background: linear-gradient(90deg, var(--primary), transparent); }
+        .stat-card.passed::before { background: linear-gradient(90deg, var(--success), transparent); }
+        .stat-card.failed::before { background: linear-gradient(90deg, var(--danger), transparent); }
+        .stat-card.rate::before { background: linear-gradient(90deg, var(--warning), transparent); }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--card-hover-border);
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .stat-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card.total .stat-icon-wrapper { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .stat-card.passed .stat-icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-card.failed .stat-icon-wrapper { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .stat-card.rate .stat-icon-wrapper { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+        /* Middle Section: Radial Rate & Category Breakdown */
+        .analytics-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 992px) {
+            .analytics-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Radial Chart */
+        .radial-chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0;
+            gap: 1rem;
+        }
+
+        .radial-svg {
+            transform: rotate(-90deg);
+            width: 160px;
+            height: 160px;
+        }
+
+        .radial-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.04);
+            stroke-width: 14;
+        }
+
+        .radial-progress {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 14;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
+
+        .radial-text {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+        }
+
+        .radial-pct {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .radial-lbl {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+
+        .radial-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Category bars */
+        .category-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .cat-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .cat-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .cat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .cat-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .cat-ratio {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            width: 0;
+            transition: width 1s ease-out;
+        }
+
+        .cat-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .cat-status-tag {
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .cat-status-tag.perfect { color: var(--success); }
+        .cat-status-tag.warning { color: var(--warning); }
+        .cat-status-tag.critical { color: var(--danger); }
+
+        /* Controls Block */
+        .controls-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0.85rem 1rem 0.85rem 2.75rem;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            fill: var(--text-muted);
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .filter-select {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            outline: none;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25em;
+            padding-right: 2.5rem;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+            background-color: #0f172a;
+        }
+
+        .filter-select option {
+            background-color: #0f172a;
+            color: var(--text-primary);
+        }
+
+        /* Results table/cards block */
+        .results-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .results-header {
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .results-count {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .results-count span {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* Responsive table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.01);
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        td {
+            padding: 1.15rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        tbody tr:hover td {
+            background: var(--card-hover-bg);
+            color: var(--text-primary);
+        }
+
+        tbody tr.active td {
+            background: rgba(59, 130, 246, 0.04);
+            border-bottom-color: rgba(59, 130, 246, 0.2);
+        }
+
+        /* Badge/Tags */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            white-space: nowrap;
+        }
+
+        .badge.pass {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge.fail {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .badge.not-run {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .badge.prio-high {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--prio-high);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        .badge.prio-med {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--prio-med);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge.prio-low {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--prio-low);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .badge.platform {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+        }
+
+        .tc-id {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .tc-desc {
+            font-weight: 500;
+        }
+
+        .tc-feature {
+            color: var(--text-secondary);
+        }
+
+        /* Collapsible Detail Area */
+        .detail-row {
+            display: none;
+        }
+
+        .detail-row.open {
+            display: table-row;
+        }
+
+        .detail-cell {
+            padding: 0 !important;
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .detail-content {
+            padding: 1.75rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            animation: slideDown 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-lbl {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-lbl svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-muted);
+        }
+
+        .detail-val {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 0.85rem;
+            font-size: 0.85rem;
+            white-space: pre-line;
+            color: var(--text-primary);
+        }
+
+        .detail-val.steps {
+            font-family: var(--font-sans);
+            line-height: 1.6;
+        }
+
+        .detail-val.actual.pass {
+            border-color: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.02);
+            color: #d1fae5;
+        }
+
+        .detail-val.actual.fail {
+            border-color: rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, 0.02);
+            color: #fee2e2;
+        }
+
+        /* Chevron indicator */
+        .chevron {
+            transition: var(--transition);
+            fill: var(--text-muted);
+            width: 20px;
+            height: 20px;
+        }
+
+        tbody tr.active .chevron {
+            transform: rotate(180deg);
+            fill: var(--primary);
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <h1>RCT Education Portal</h1>
+                <p><span class="pulse-dot"></span> E2E Automated QA Suite Analysis</p>
+            </div>
+            <div id="readiness-badge" class="status-badge">
+                <span class="badge-icon">⏳</span>
+                <span>Calculating Readiness...</span>
+            </div>
+        </header>
+
+        <!-- Stats Counter Grid -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-info">
+                    <span class="stat-label">Total Test Cases</span>
+                    <span id="stat-total" class="stat-value">-</span>
+                </div>
+                <div class="stat-icon-wrapper">📊</div>
+            </div>
+            <div class="stat-card passed">
+                <div class="stat-info">
+                    <span class="stat-label">Assertions Passed</span>
+                    <span id="stat-passed" class="stat-value">-</span>
+                </div>
+                <div class="stat-icon-wrapper">✓</div>
+            </div>
+            <div class="stat-card failed">
+                <div class="stat-info">
+                    <span class="stat-label">Assertions Failed</span>
+                    <span id="stat-failed" class="stat-value">-</span>
+                </div>
+                <div class="stat-icon-wrapper">✗</div>
+            </div>
+            <div class="stat-card rate">
+                <div class="stat-info">
+                    <span class="stat-label">Verification Rate</span>
+                    <span id="stat-rate" class="stat-value">-%</span>
+                </div>
+                <div class="stat-icon-wrapper">⚡</div>
+            </div>
+        </div>
+
+        <!-- Middle section: charts and bars -->
+        <div class="analytics-section">
+            <!-- Left panel: Radial Gauge -->
+            <div class="panel">
+                <h3 class="panel-title">Readiness Rate</h3>
+                <div class="radial-chart-container">
+                    <div class="radial-wrapper">
+                        <svg class="radial-svg">
+                            <circle class="radial-bg" cx="80" cy="80" r="70" />
+                            <circle id="radial-progress-circle" class="radial-progress" cx="80" cy="80" r="70" />
+                        </svg>
+                        <div class="radial-text">
+                            <span id="radial-pct-val" class="radial-pct">-%</span>
+                            <span class="radial-lbl">Pass Score</span>
+                        </div>
+                    </div>
+                    <div style="text-align: center; font-size: 0.85rem; color: var(--text-secondary);">
+                        Requires <span style="color: var(--success); font-weight: 700;">&ge; 95%</span> pass score to deploy.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right panel: Categories breakdown -->
+            <div class="panel">
+                <h3 class="panel-title">Verify Status by Category</h3>
+                <div id="category-bars-container" class="category-breakdown">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls section -->
+        <div class="controls-panel">
+            <div class="search-row">
+                <div class="search-wrapper">
+                    <!-- Search Icon SVG -->
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 21L16.65 16.65" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" id="search-bar" class="search-input" placeholder="Search test cases by ID, description, feature activity...">
+                </div>
+            </div>
+
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="filter-category">Category</label>
+                    <select id="filter-category" class="filter-select">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-platform">Platform</label>
+                    <select id="filter-platform" class="filter-select">
+                        <option value="all">All Platforms</option>
+                        <option value="Web App">Web App</option>
+                        <option value="Backend API">Backend API</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-priority">Priority</label>
+                    <select id="filter-priority" class="filter-select">
+                        <option value="all">All Priorities</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-status">Status</label>
+                    <select id="filter-status" class="filter-select">
+                        <option value="all">All Statuses</option>
+                        <option value="Pass">Pass</option>
+                        <option value="Fail">Fail</option>
+                        <option value="Not Run">Not Run</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed results section -->
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-count">
+                    Showing <span id="filtered-count">0</span> of <span id="total-count">0</span> test cases
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 140px;">Test Case ID</th>
+                            <th style="width: 180px;">Category</th>
+                            <th style="width: 150px;">Platform</th>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th style="width: 120px; text-align: center;">Priority</th>
+                            <th style="width: 120px; text-align: center;">Status</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="test-cases-body">
+                        <!-- Dynamic items -->
+                    </tbody>
+                </table>
+
+                <div id="no-results" class="empty-state">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3>No Test Cases Found</h3>
+                    <p>Try adjusting your filters or search keywords.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>RCT Portal QA Orchestrator Dashboard | Data auto-generated via Python openpyxl pipeline</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem;" id="timestamp-val">Last Updated: -</p>
+        </footer>
+    </div>
+
+    <!-- Data Import Script -->
+    <script src="test_cases_data.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Safety check for data
+            if (typeof TEST_CASES_DATA === 'undefined') {
+                console.error("TEST_CASES_DATA is not loaded. Ensure test_cases_data.js is present.");
+                document.getElementById('readiness-badge').innerHTML = '❌ Data File Missing';
+                document.getElementById('readiness-badge').className = 'status-badge non-deployable';
+                return;
+            }
+
+            const data = TEST_CASES_DATA;
+            const testCases = data.test_cases;
+            const summary = data.summary;
+
+            // Initialize Stats
+            document.getElementById('stat-total').innerText = summary.total;
+            document.getElementById('stat-passed').innerText = summary.passed;
+            document.getElementById('stat-failed').innerText = summary.failed;
+            document.getElementById('stat-rate').innerText = summary.pass_rate.toFixed(1) + '%';
+            document.getElementById('timestamp-val').innerText = 'Last Updated: ' + summary.timestamp;
+            document.getElementById('total-count').innerText = summary.total;
+
+            // Readiness Badge
+            const badge = document.getElementById('readiness-badge');
+            if (summary.deployable) {
+                badge.innerHTML = '<span class="badge-icon">✅</span> <span>Deployable</span>';
+                badge.className = 'status-badge deployable';
+            } else {
+                badge.innerHTML = '<span class="badge-icon">❌</span> <span>Non-Deployable</span>';
+                badge.className = 'status-badge non-deployable';
+            }
+
+            // Radial Chart Offset
+            const circle = document.getElementById('radial-progress-circle');
+            const pctVal = document.getElementById('radial-pct-val');
+            
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            
+            // Animate progress circle
+            setTimeout(() => {
+                const offset = circumference - (summary.pass_rate / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+                pctVal.innerText = summary.pass_rate.toFixed(1) + '%';
+                circle.style.stroke = summary.pass_rate >= 95.0 ? 'var(--success)' : 'var(--danger)';
+            }, 100);
+
+            // Extract unique categories and populate filter
+            const categories = [...new Set(testCases.map(tc => tc.category))];
+            const catSelect = document.getElementById('filter-category');
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                catSelect.appendChild(opt);
+            });
+
+            // Compute statistics by category
+            const catStats = {};
+            categories.forEach(cat => {
+                catStats[cat] = { total: 0, passed: 0 };
+            });
+
+            testCases.forEach(tc => {
+                if (catStats[tc.category]) {
+                    catStats[tc.category].total++;
+                    if (tc.status === 'Pass') {
+                        catStats[tc.category].passed++;
+                    }
+                }
+            });
+
+            // Populate category breakdown bars
+            const barsContainer = document.getElementById('category-bars-container');
+            barsContainer.innerHTML = '';
+            
+            categories.forEach(cat => {
+                const stats = catStats[cat];
+                const pct = stats.total > 0 ? (stats.passed / stats.total) * 100 : 0;
+                
+                let barColor = 'var(--success)';
+                let statusTag = 'Perfect';
+                let statusClass = 'perfect';
+
+                if (pct < 90) {
+                    barColor = 'var(--danger)';
+                    statusTag = 'Critical';
+                    statusClass = 'critical';
+                } else if (pct < 100) {
+                    barColor = 'var(--warning)';
+                    statusTag = 'Warning';
+                    statusClass = 'warning';
+                }
+
+                const catDiv = document.createElement('div');
+                catDiv.className = 'cat-item';
+                catDiv.innerHTML = `
+                    <div class="cat-header">
+                        <span class="cat-name">${cat}</span>
+                        <span class="cat-ratio">${stats.passed}/${stats.total}</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: 0%; background: ${barColor}"></div>
+                    </div>
+                    <div class="cat-meta">
+                        <span>Score: ${pct.toFixed(0)}%</span>
+                        <span class="cat-status-tag ${statusClass}">${statusTag}</span>
+                    </div>
+                `;
+                barsContainer.appendChild(catDiv);
+
+                // Animate progress bars
+                setTimeout(() => {
+                    catDiv.querySelector('.progress-bar-fill').style.width = pct.toFixed(0) + '%';
+                }, 150);
+            });
+
+            // Filter implementation
+            const searchBar = document.getElementById('search-bar');
+            const filterCat = document.getElementById('filter-category');
+            const filterPlat = document.getElementById('filter-platform');
+            const filterPrio = document.getElementById('filter-priority');
+            const filterStat = document.getElementById('filter-status');
+            const tbody = document.getElementById('test-cases-body');
+            const noResults = document.getElementById('no-results');
+            const filteredCount = document.getElementById('filtered-count');
+
+            function renderRows() {
+                const query = searchBar.value.toLowerCase().trim();
+                const cat = filterCat.value;
+                const plat = filterPlat.value;
+                const prio = filterPrio.value;
+                const stat = filterStat.value;
+
+                // Clear table rows
+                tbody.innerHTML = '';
+
+                // Filtering
+                const filtered = testCases.filter(tc => {
+                    const matchQuery = tc.id.toLowerCase().includes(query) || 
+                                       tc.description.toLowerCase().includes(query) || 
+                                       tc.feature.toLowerCase().includes(query);
+                    const matchCat = cat === 'all' || tc.category === cat;
+                    const matchPlat = plat === 'all' || tc.platform === plat;
+                    const matchPrio = prio === 'all' || tc.priority === prio;
+                    const matchStat = stat === 'all' || tc.status === stat;
+
+                    return matchQuery && matchCat && matchPlat && matchPrio && matchStat;
+                });
+
+                filteredCount.innerText = filtered.length;
+
+                if (filtered.length === 0) {
+                    noResults.style.display = 'flex';
+                    return;
+                } else {
+                    noResults.style.display = 'none';
+                }
+
+                // Render matching rows
+                filtered.forEach(tc => {
+                    const tr = document.createElement('tr');
+                    tr.id = `row-${tc.id}`;
+                    tr.dataset.id = tc.id;
+                    
+                    const statusClass = tc.status.toLowerCase().replace(' ', '-');
+                    const prioClass = tc.priority.toLowerCase();
+
+                    tr.innerHTML = `
+                        <td class="tc-id">${tc.id}</td>
+                        <td><span style="font-size: 0.85rem; color: var(--text-secondary);">${tc.category}</span></td>
+                        <td><span class="badge platform">${tc.platform}</span></td>
+                        <td class="tc-feature">${tc.feature}</td>
+                        <td class="tc-desc">${tc.description}</td>
+                        <td style="text-align: center;"><span class="badge prio-${prioClass}">${tc.priority}</span></td>
+                        <td style="text-align: center;"><span class="badge ${statusClass}">${tc.status}</span></td>
+                        <td style="text-align: center;">
+                            <svg class="chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </td>
+                    `;
+
+                    // Details block
+                    const detailTr = document.createElement('tr');
+                    detailTr.id = `detail-${tc.id}`;
+                    detailTr.className = 'detail-row';
+                    
+                    const statusActualClass = tc.status === 'Pass' ? 'pass' : (tc.status === 'Fail' ? 'fail' : '');
+
+                    detailTr.innerHTML = `
+                        <td colspan="8" class="detail-cell">
+                            <div class="detail-content">
+                                <div class="detail-block">
+                                    <span class="detail-lbl">
+                                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                        Pre-conditions
+                                    </span>
+                                    <div class="detail-val">${tc.preconditions || 'None'}</div>
+                                </div>
+                                <div class="detail-block">
+                                    <span class="detail-lbl">
+                                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2zm0 8H7v-2h10v2z"/></svg>
+                                        Execution Steps
+                                    </span>
+                                    <div class="detail-val steps">${tc.steps}</div>
+                                </div>
+                                <div class="detail-block">
+                                    <span class="detail-lbl">
+                                        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                                        Expected Outcome
+                                    </span>
+                                    <div class="detail-val">${tc.expected}</div>
+                                </div>
+                                <div class="detail-block">
+                                    <span class="detail-lbl">
+                                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                                        Actual Execution Log
+                                    </span>
+                                    <div class="detail-val actual ${statusActualClass}">${tc.actual || 'No logs recorded.'}</div>
+                                </div>
+                            </div>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                    tbody.appendChild(detailTr);
+
+                    // Click handler to expand
+                    tr.addEventListener('click', () => {
+                        const isOpen = detailTr.classList.contains('open');
+                        
+                        if (isOpen) {
+                            detailTr.classList.remove('open');
+                            tr.classList.remove('active');
+                        } else {
+                            detailTr.classList.add('open');
+                            tr.classList.add('active');
+                        }
+                    });
+                });
+            }
+
+            // Bind Event Listeners
+            searchBar.addEventListener('input', renderRows);
+            filterCat.addEventListener('change', renderRows);
+            filterPlat.addEventListener('change', renderRows);
+            filterPrio.addEventListener('change', renderRows);
+            filterStat.addEventListener('change', renderRows);
+
+            // Initial Draw
+            renderRows();
+        });
+    </script>
+</body>
+</html>
