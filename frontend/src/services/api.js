@@ -1,6 +1,14 @@
 import axios from 'axios';
 
+// Replace this with your actual Render URL after deploying it
+const RENDER_BACKEND_URL = 'https://rct-education-web.onrender.com';
+
 const getApiBaseURL = () => {
+  // If running on GitHub Pages, route API requests to Render backend
+  if (window.location.hostname.endsWith('github.io')) {
+    return `${RENDER_BACKEND_URL}/backend/api`;
+  }
+
   if (import.meta.env.DEV) {
     return '/api';
   }
