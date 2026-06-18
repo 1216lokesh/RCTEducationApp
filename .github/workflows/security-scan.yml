@@ -39,7 +39,7 @@ jobs:
 
       - name: Start Local PHP Web Server
         run: |
-          DB_HOST=127.0.0.1 php -S 127.0.0.1:8000 &
+          PHP_CLI_SERVER_WORKERS=20 DB_HOST=127.0.0.1 php -S 127.0.0.1:8000 &
           sleep 3
 
       - name: Setup Node.js
@@ -107,3 +107,26 @@ jobs:
           name: backend-qa-report-csv
           path: rct-education-web/backend/automated_tests/test_cases.csv
           if-no-files-found: warn
+
+      - name: Run Baseline/Load Testing
+        run: |
+          cd rct-education-web/backend/automated_tests
+          python run_load_tests.py
+        env:
+          BASE_URL: "http://127.0.0.1:8000/rct-education-web"
+          DB_HOST: "127.0.0.1"
+
+      - name: Upload Load Test Excel Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-report-excel
+          path: rct-education-web/backend/automated_tests/load_test_report.xlsx
+          if-no-files-found: warn
+
+      - name: Publish Load Test Summary
+        if: always()
+        run: |
+          if [ -f rct-education-web/backend/automated_tests/load_test_summary.md ]; then
+            cat rct-education-web/backend/automated_tests/load_test_summary.md >> $GITHUB_STEP_SUMMARY
+          fi
