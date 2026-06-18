@@ -4,25 +4,28 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'frontend/**'
   workflow_dispatch:
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build-and-commit-root:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -41,22 +44,14 @@ jobs:
           cd frontend
           npm run build
 
-      - name: Copy Build Files to Root
-        run: |
-          cp -rf frontend/dist/* .
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-      - name: Commit and Push Build Files
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-          # Stage the built assets, index.html, and favicons/icons
-          git add index.html assets/ favicon.svg icons.svg
-          
-          # Commit and push only if changes exist
-          if ! git diff-index --quiet HEAD; then
-            git commit -m "chore(deploy): automatically build and update static website files in root [skip ci]"
-            git push origin main
-          else
-            echo "No changes in built files to commit."
-          fi
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './frontend/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
