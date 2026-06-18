@@ -1,12 +1,25 @@
 import axios from 'axios';
 
 // Replace this with your actual Render URL after deploying it
-const RENDER_BACKEND_URL = 'https://rct-education-web.onrender.com';
+const RENDER_BACKEND_URL = import.meta.env.VITE_API_URL || 'https://rct-education-web.onrender.com';
 
 const getApiBaseURL = () => {
+  // Allow dynamic runtime override via localStorage (very useful for testing/changing endpoints)
+  const localStorageUrl = localStorage.getItem('BACKEND_URL');
+  if (localStorageUrl) {
+    return localStorageUrl;
+  }
+
   // If running on GitHub Pages, route API requests to Render backend
   if (window.location.hostname.endsWith('github.io')) {
-    return `${RENDER_BACKEND_URL}/backend/api`;
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL.endsWith('/api') 
+        ? import.meta.env.VITE_API_URL 
+        : `${import.meta.env.VITE_API_URL}/backend/api`;
+    }
+    return RENDER_BACKEND_URL.endsWith('/api')
+      ? RENDER_BACKEND_URL
+      : `${RENDER_BACKEND_URL}/backend/api`;
   }
 
   if (import.meta.env.DEV) {
