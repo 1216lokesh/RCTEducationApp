@@ -15,6 +15,15 @@ class Auth {
     // Start session
     public static function startSession() {
         if (session_status() === PHP_SESSION_NONE) {
+            // Set secure session cookie parameters for cross-domain tracking
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '', // blank defaults to host domain
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'None'
+            ]);
             session_start();
         }
     }
@@ -81,8 +90,17 @@ class Auth {
         $token = bin2hex(random_bytes(32));
         $expiry = time() + (REMEMBER_ME_DAYS * 24 * 60 * 60);
 
-        setcookie('remember_token', $token, $expiry, '/');
-        setcookie('remember_user', $userId, $expiry, '/');
+        $options = [
+            'expires' => $expiry,
+            'path' => '/',
+            'domain' => '',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None'
+        ];
+
+        setcookie('remember_token', $token, $options);
+        setcookie('remember_user', $userId, $options);
     }
 
     // Check remember me cookie
@@ -105,8 +123,18 @@ class Auth {
     // Logout user
     public function logout() {
         session_destroy();
-        setcookie('remember_token', '', time() - 3600, '/');
-        setcookie('remember_user', '', time() - 3600, '/');
+        
+        $options = [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'domain' => '',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None'
+        ];
+
+        setcookie('remember_token', '', $options);
+        setcookie('remember_user', '', $options);
     }
 
     // Check if user is logged in

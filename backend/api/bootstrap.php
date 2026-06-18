@@ -20,10 +20,6 @@ require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/Language.php';
 require_once __DIR__ . '/../classes/Auth.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 $db = new Database();
 Auth::startSession();
 $auth = new Auth($db);
